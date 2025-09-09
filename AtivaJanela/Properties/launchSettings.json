@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AtivaJanela": {
+      "commandName": "Project",
+      "commandLineArgs": "/iniciar /tecladoalfanumerico"
+    }
+  }
+}
