@@ -1,4 +1,6 @@
 using Microsoft.VisualBasic.Logging;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace AtivaJanela
 {
@@ -9,7 +11,37 @@ namespace AtivaJanela
         public string[] Parametros { get; set; }
 
         long IntervaloTempoSemTecla = 120;
-        long TempoSemTecla = 0;
+        static long TempoSemTecla = 0;
+
+        private Boolean Ativo = false;
+        private Boolean TecladoAlfaNumerico = false;
+
+        #region Captura de movimentos do mouse (Apenas Windows)
+
+        private static IntPtr hookId = IntPtr.Zero;
+        private static LowLevelMouseProc varOcg = HookCallback; // variável obrigatória
+
+        private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
+        private const int WH_MOUSE_LL = 14;
+        private const int WM_MOUSEMOVE = 0x0200;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct POINT
+        {
+            public int x;
+            public int y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MSLLHOOKSTRUCT
+        {
+            public POINT pt;
+            public uint mouseData;
+            public uint flags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
+
         KeyboardHook kbh;
 
         private List<String> Teclas = new List<string>() {
@@ -20,11 +52,21 @@ namespace AtivaJanela
             "{TAB}",
             "{CAPSLOCK}"
         };
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn,
+            IntPtr hMod, uint dwThreadId);
 
-        private Boolean Ativo = false;
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
-        private Boolean TecladoAlfaNumerico = false;
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode,
+            IntPtr wParam, IntPtr lParam);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        #endregion
 
         public FrmPrincipal()
         {
@@ -152,6 +194,8 @@ namespace AtivaJanela
             {
                 IntervaloTempoSemTecla = 120;
             }
+            hookId = SetHook(varOcg);
+
             LblIntervaloDecorrido.Text = "";
             Application.DoEvents();
             Log($"Intervalo: {IntervaloTempoSemTecla}");
@@ -180,6 +224,9 @@ namespace AtivaJanela
         {
             TxtIntervaloTempo.Enabled = true;
             LblIntervaloDecorrido.Text = "";
+
+            UnhookWindowsHookEx(hookId);
+
             Application.DoEvents();
             if (kbh != null)
             {
@@ -197,5 +244,30 @@ namespace AtivaJanela
             Application.DoEvents();
             Ativo = false;
         }
+
+
+        #region Captura de movimentos do mouse (Apenas Windows)
+        private static IntPtr SetHook(LowLevelMouseProc proc)
+        {
+            using (Process curProcess = Process.GetCurrentProcess())
+            using (ProcessModule curModule = curProcess.MainModule)
+            {
+                return SetWindowsHookEx(WH_MOUSE_LL, proc,
+                    GetModuleHandle(curModule.ModuleName), 0);
+            }
+        }
+        private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0)
+            {
+                MSLLHOOKSTRUCT hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+                if (wParam == (IntPtr)WM_MOUSEMOVE)
+                {
+                    TempoSemTecla = 0;
+                }
+            }
+            return CallNextHookEx(hookId, nCode, wParam, lParam);
+        }
+        #endregion
     }
 }
