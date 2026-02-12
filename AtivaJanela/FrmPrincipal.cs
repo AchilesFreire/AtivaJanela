@@ -7,6 +7,7 @@ namespace AtivaJanela
     public partial class FrmPrincipal : Form
     {
 
+
         private bool IniciadoAutomaticamente = false;
         public string[] Parametros { get; set; }
 
@@ -15,6 +16,7 @@ namespace AtivaJanela
 
         private Boolean Ativo = false;
         private Boolean TecladoAlfaNumerico = false;
+        private string AplicativoAlvo = "";
 
         #region Captura de movimentos do mouse (Apenas Windows)
 
@@ -52,6 +54,12 @@ namespace AtivaJanela
             "{TAB}",
             "{CAPSLOCK}"
         };
+
+        #endregion
+
+        #region Imports
+
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn,
             IntPtr hMod, uint dwThreadId);
@@ -66,7 +74,12 @@ namespace AtivaJanela
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
+        [DllImport("user32.dll", SetLastError = true)] 
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
         #endregion
+
+        #region Eventos do Formulário
 
         public FrmPrincipal()
         {
@@ -74,6 +87,7 @@ namespace AtivaJanela
         }
         private void Form1_Load(object sender, EventArgs e)
         {
+
             bool Iniciar = false;
             foreach (var parametro in Parametros)
             {
@@ -81,6 +95,9 @@ namespace AtivaJanela
                     Iniciar = true;
                 if (parametro.Equals("/tecladoalfanumerico", StringComparison.OrdinalIgnoreCase))
                     TecladoAlfaNumerico = true;
+
+                if (parametro.StartsWith("/aplicativoalvo:", StringComparison.OrdinalIgnoreCase))
+                    AplicativoAlvo = parametro.Split(':')[1];
 
             }
             if (TecladoAlfaNumerico)
@@ -109,6 +126,9 @@ namespace AtivaJanela
                     Log(Teclas.Count + " Teclas detectadas");
                 }
             }
+
+            AtualizaProgramasAtivos();
+
             if (Iniciar)
             {
                 IniciadoAutomaticamente = true;
@@ -133,6 +153,8 @@ namespace AtivaJanela
             }
         }
 
+        #endregion
+
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -145,6 +167,27 @@ namespace AtivaJanela
                 {
                     var pos = DateTime.Now.Millisecond % Teclas.Count;
                     var tecla = Teclas[pos];
+                    if (!string.IsNullOrEmpty(AplicativoAlvo))
+                    {
+                        try
+                        {
+                            var processos = Process.GetProcessesByName(AplicativoAlvo);
+                            if (processos.Length > 0)
+                            {
+                                var processo = processos[0];
+                                IntPtr handle = processo.MainWindowHandle;
+                                if (handle != IntPtr.Zero)
+                                {
+                                    SetForegroundWindow(handle);
+                                }
+                            }
+                        }
+                        catch 
+                        {
+
+                        }
+
+                    }   
                     SendKeys.Send(tecla);
                     Log(tecla);
                     Application.DoEvents();
@@ -159,15 +202,24 @@ namespace AtivaJanela
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        #region Eventos dos Botoes
+
+        private void BtnAtualizarProgramasAtivos_Click(object sender, EventArgs e)
+        {
+            AtualizaProgramasAtivos();
+        }
+        private void BtnIniciar_Click(object sender, EventArgs e)
         {
             Inicia();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void BtnParar_Click(object sender, EventArgs e)
         {
             Para();
         }
+        #endregion
+
+        #region Metodos
 
         private void Log(String txt, Boolean Erro = false)
         {
@@ -184,6 +236,7 @@ namespace AtivaJanela
         {
             TempoSemTecla = 0;
         }
+
         private void Inicia()
         {
             if (long.TryParse(TxtIntervaloTempo.Text, out long intervalo))
@@ -195,6 +248,9 @@ namespace AtivaJanela
                 IntervaloTempoSemTecla = 120;
             }
             hookId = SetHook(varOcg);
+
+            if (CboProgramasAtivos.SelectedIndex > 0)
+                AplicativoAlvo = CboProgramasAtivos.Text;
 
             LblIntervaloDecorrido.Text = "";
             Application.DoEvents();
@@ -217,8 +273,6 @@ namespace AtivaJanela
             this.Hide();
             Ativo = true;
         }
-
-
 
         private void Para()
         {
@@ -245,6 +299,20 @@ namespace AtivaJanela
             Ativo = false;
         }
 
+        private void AtualizaProgramasAtivos()
+        {
+            var processos = Process.GetProcesses().ToList();
+            var processosComJanela = processos.Where( p=>   p.MainWindowHandle != 0).Select(p => p.ProcessName).ToList();
+
+            var index = processosComJanela.FindIndex(p => p.Equals(AplicativoAlvo, StringComparison.OrdinalIgnoreCase));
+
+            CboProgramasAtivos.Items.Clear();
+            CboProgramasAtivos.Items.AddRange(processosComJanela.ToArray());
+            if (index >= 0)
+                CboProgramasAtivos.SelectedIndex = index;   
+        }
+
+        #endregion
 
         #region Captura de movimentos do mouse (Apenas Windows)
         private static IntPtr SetHook(LowLevelMouseProc proc)
@@ -269,5 +337,6 @@ namespace AtivaJanela
             return CallNextHookEx(hookId, nCode, wParam, lParam);
         }
         #endregion
+       
     }
 }

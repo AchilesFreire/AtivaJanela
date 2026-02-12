@@ -39,6 +39,9 @@
             notifyIcon1 = new NotifyIcon(components);
             LblIntervaloDecorrido = new Label();
             LblUltimaTecla = new Label();
+            label1 = new Label();
+            CboProgramasAtivos = new ComboBox();
+            BtnAtualizarProgramasAtivos = new Button();
             SuspendLayout();
             // 
             // timer1
@@ -52,13 +55,13 @@
             button1.FlatAppearance.BorderColor = Color.SteelBlue;
             button1.FlatStyle = FlatStyle.Flat;
             button1.ForeColor = Color.SteelBlue;
-            button1.Location = new Point(100, 21);
+            button1.Location = new Point(126, 73);
             button1.Name = "button1";
             button1.Size = new Size(85, 34);
             button1.TabIndex = 0;
             button1.Text = "Iniciar";
             button1.UseVisualStyleBackColor = false;
-            button1.Click += button1_Click;
+            button1.Click += BtnIniciar_Click;
             // 
             // button2
             // 
@@ -67,19 +70,19 @@
             button2.FlatAppearance.BorderColor = Color.SteelBlue;
             button2.FlatStyle = FlatStyle.Flat;
             button2.ForeColor = Color.SteelBlue;
-            button2.Location = new Point(191, 21);
+            button2.Location = new Point(217, 73);
             button2.Name = "button2";
             button2.Size = new Size(85, 34);
             button2.TabIndex = 0;
             button2.Text = "Parar";
             button2.UseVisualStyleBackColor = false;
-            button2.Click += button2_Click;
+            button2.Click += BtnParar_Click;
             // 
             // label2
             // 
             label2.Font = new Font("Segoe UI", 9F);
             label2.ForeColor = Color.SteelBlue;
-            label2.Location = new Point(6, 63);
+            label2.Location = new Point(6, 128);
             label2.Name = "label2";
             label2.Size = new Size(88, 20);
             label2.TabIndex = 2;
@@ -88,7 +91,7 @@
             // TxtIntervaloTempo
             // 
             TxtIntervaloTempo.BackColor = Color.LightGray;
-            TxtIntervaloTempo.Location = new Point(6, 32);
+            TxtIntervaloTempo.Location = new Point(6, 84);
             TxtIntervaloTempo.Name = "TxtIntervaloTempo";
             TxtIntervaloTempo.Size = new Size(88, 23);
             TxtIntervaloTempo.TabIndex = 3;
@@ -98,7 +101,7 @@
             // 
             label3.AutoSize = true;
             label3.ForeColor = Color.SteelBlue;
-            label3.Location = new Point(6, 6);
+            label3.Location = new Point(6, 58);
             label3.Name = "label3";
             label3.Size = new Size(88, 15);
             label3.TabIndex = 2;
@@ -115,7 +118,7 @@
             // 
             LblIntervaloDecorrido.Font = new Font("Segoe UI", 9F);
             LblIntervaloDecorrido.ForeColor = Color.SteelBlue;
-            LblIntervaloDecorrido.Location = new Point(219, 63);
+            LblIntervaloDecorrido.Location = new Point(245, 125);
             LblIntervaloDecorrido.Name = "LblIntervaloDecorrido";
             LblIntervaloDecorrido.Size = new Size(57, 20);
             LblIntervaloDecorrido.TabIndex = 2;
@@ -125,21 +128,52 @@
             // 
             LblUltimaTecla.Font = new Font("Segoe UI", 9F);
             LblUltimaTecla.ForeColor = Color.SteelBlue;
-            LblUltimaTecla.Location = new Point(100, 63);
+            LblUltimaTecla.Location = new Point(100, 128);
             LblUltimaTecla.Name = "LblUltimaTecla";
             LblUltimaTecla.Size = new Size(85, 20);
             LblUltimaTecla.TabIndex = 2;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.ForeColor = Color.SteelBlue;
+            label1.Location = new Point(6, 9);
+            label1.Name = "label1";
+            label1.Size = new Size(90, 15);
+            label1.TabIndex = 2;
+            label1.Text = "Aplicativo Alvo:";
+            // 
+            // CboProgramasAtivos
+            // 
+            CboProgramasAtivos.FormattingEnabled = true;
+            CboProgramasAtivos.Location = new Point(6, 27);
+            CboProgramasAtivos.Name = "CboProgramasAtivos";
+            CboProgramasAtivos.Size = new Size(218, 23);
+            CboProgramasAtivos.TabIndex = 4;
+            // 
+            // BtnAtualizarProgramasAtivos
+            // 
+            BtnAtualizarProgramasAtivos.Location = new Point(230, 27);
+            BtnAtualizarProgramasAtivos.Name = "BtnAtualizarProgramasAtivos";
+            BtnAtualizarProgramasAtivos.Size = new Size(72, 23);
+            BtnAtualizarProgramasAtivos.TabIndex = 5;
+            BtnAtualizarProgramasAtivos.Text = "Atualizar";
+            BtnAtualizarProgramasAtivos.UseVisualStyleBackColor = true;
+            BtnAtualizarProgramasAtivos.Click += BtnAtualizarProgramasAtivos_Click;
             // 
             // FrmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LightSteelBlue;
-            ClientSize = new Size(280, 93);
+            ClientSize = new Size(314, 155);
+            Controls.Add(BtnAtualizarProgramasAtivos);
+            Controls.Add(CboProgramasAtivos);
             Controls.Add(TxtIntervaloTempo);
             Controls.Add(LblIntervaloDecorrido);
             Controls.Add(LblUltimaTecla);
             Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(label3);
             Controls.Add(button2);
             Controls.Add(button1);
@@ -165,5 +199,8 @@
         private NotifyIcon notifyIcon1;
         private Label LblIntervaloDecorrido;
         private Label LblUltimaTecla;
+        private Label label1;
+        private ComboBox CboProgramasAtivos;
+        private Button BtnAtualizarProgramasAtivos;
     }
 }
