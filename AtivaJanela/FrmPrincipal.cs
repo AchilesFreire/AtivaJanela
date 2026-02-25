@@ -19,6 +19,8 @@ namespace AtivaJanela
         private Boolean RastrearMovimentoMouse = false;
         private string AplicativoAlvo = "";
 
+        private long TotalTempoAtivo = 0;
+
         #region Captura de movimentos do mouse (Apenas Windows)
 
         private static IntPtr hookId = IntPtr.Zero;
@@ -144,6 +146,8 @@ namespace AtivaJanela
             e.Cancel = Ativo;
             if (Ativo)
                 this.Hide();
+            else
+                SalvaTempoAtivo();
         }
 
         private void FrmPrincipal_Shown(object sender, EventArgs e)
@@ -194,6 +198,7 @@ namespace AtivaJanela
                     Log(tecla);
                     Application.DoEvents();
                     TempoSemTecla = 0;
+                    TotalTempoAtivo += IntervaloTempoSemTecla;
                 }
             }
             catch (Exception ex)
@@ -346,6 +351,24 @@ namespace AtivaJanela
             Itm_Parar.Enabled = Ativo;
         }   
                 
+
+        private void SalvaTempoAtivo()
+        {
+            try
+            {
+                if (TotalTempoAtivo > 0)
+                {
+                    var folder = Application.CommonAppDataPath.Substring(0, Application.CommonAppDataPath.LastIndexOf("\\"));
+
+                    var logPath = Path.Combine(folder, DateTime.Now.ToString("yyyy-MM-dd") + ".log");
+                    var logEntry = $"{DateTime.Now}: Tempo ativo total: {TotalTempoAtivo} segundos";
+                    File.AppendAllText(logPath, logEntry + Environment.NewLine);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
         #endregion
 
         #region Captura de movimentos do mouse (Apenas Windows)
