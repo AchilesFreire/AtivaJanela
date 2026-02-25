@@ -16,12 +16,13 @@ namespace AtivaJanela
 
         private Boolean Ativo = false;
         private Boolean TecladoAlfaNumerico = false;
+        private Boolean RastrearMovimentoMouse = false;
         private string AplicativoAlvo = "";
 
         #region Captura de movimentos do mouse (Apenas Windows)
 
         private static IntPtr hookId = IntPtr.Zero;
-        private static LowLevelMouseProc varOcg = HookCallback; // variável obrigatória
+        private static LowLevelMouseProc varOcg = HookCallback;
 
         private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
         private const int WH_MOUSE_LL = 14;
@@ -59,7 +60,6 @@ namespace AtivaJanela
 
         #region Imports
 
-
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn,
             IntPtr hMod, uint dwThreadId);
@@ -74,7 +74,7 @@ namespace AtivaJanela
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
-        [DllImport("user32.dll", SetLastError = true)] 
+        [DllImport("user32.dll", SetLastError = true)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         #endregion
@@ -98,6 +98,9 @@ namespace AtivaJanela
 
                 if (parametro.StartsWith("/aplicativoalvo:", StringComparison.OrdinalIgnoreCase))
                     AplicativoAlvo = parametro.Split(':')[1];
+
+                if (parametro.Equals("/rastrearmovimentomouse", StringComparison.OrdinalIgnoreCase))
+                    RastrearMovimentoMouse = true;
 
             }
             if (TecladoAlfaNumerico)
@@ -155,7 +158,6 @@ namespace AtivaJanela
 
         #endregion
 
-
         private void timer1_Tick(object sender, EventArgs e)
         {
             try
@@ -182,12 +184,12 @@ namespace AtivaJanela
                                 }
                             }
                         }
-                        catch 
+                        catch
                         {
 
                         }
 
-                    }   
+                    }
                     SendKeys.Send(tecla);
                     Log(tecla);
                     Application.DoEvents();
@@ -219,6 +221,23 @@ namespace AtivaJanela
         }
         #endregion
 
+        #region Eventos do menu de contexto
+        private void Itm_Iniciar_Click(object sender, EventArgs e)
+        {
+            Inicia();
+        }
+        private void Itm_Parar_Click(object sender, EventArgs e)
+        {
+            Para();
+        }
+
+        private void Itm_Fechar_Click(object sender, EventArgs e)
+        {
+            Para();
+            this.Close();
+        }
+        #endregion
+
         #region Metodos
 
         private void Log(String txt, Boolean Erro = false)
@@ -247,7 +266,11 @@ namespace AtivaJanela
             {
                 IntervaloTempoSemTecla = 120;
             }
-            hookId = SetHook(varOcg);
+
+            if (RastrearMovimentoMouse)
+            {
+                hookId = SetHook(varOcg);
+            }
 
             if (CboProgramasAtivos.SelectedIndex > 0)
                 AplicativoAlvo = CboProgramasAtivos.Text;
@@ -272,6 +295,8 @@ namespace AtivaJanela
 
             this.Hide();
             Ativo = true;
+
+            AtualizaMenuContexto();
         }
 
         private void Para()
@@ -297,21 +322,30 @@ namespace AtivaJanela
             label2.Text = "Parado";
             Application.DoEvents();
             Ativo = false;
+
+            AtualizaMenuContexto();
         }
 
         private void AtualizaProgramasAtivos()
         {
             var processos = Process.GetProcesses().ToList();
-            var processosComJanela = processos.Where( p=>   p.MainWindowHandle != 0).Select(p => p.ProcessName).ToList();
+            var processosComJanela = processos.Where(p => p.MainWindowHandle != 0).Select(p => p.ProcessName).ToList();
 
             var index = processosComJanela.FindIndex(p => p.Equals(AplicativoAlvo, StringComparison.OrdinalIgnoreCase));
 
             CboProgramasAtivos.Items.Clear();
             CboProgramasAtivos.Items.AddRange(processosComJanela.ToArray());
             if (index >= 0)
-                CboProgramasAtivos.SelectedIndex = index;   
+                CboProgramasAtivos.SelectedIndex = index;
         }
 
+        private void AtualizaMenuContexto()
+        {
+
+            Itm_Iniciar.Enabled = !Ativo;   
+            Itm_Parar.Enabled = Ativo;
+        }   
+                
         #endregion
 
         #region Captura de movimentos do mouse (Apenas Windows)
@@ -337,6 +371,6 @@ namespace AtivaJanela
             return CallNextHookEx(hookId, nCode, wParam, lParam);
         }
         #endregion
-       
+
     }
 }

@@ -42,6 +42,12 @@
             label1 = new Label();
             CboProgramasAtivos = new ComboBox();
             BtnAtualizarProgramasAtivos = new Button();
+            ChkRastrearMovimentoMouse = new CheckBox();
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            Itm_Iniciar = new ToolStripMenuItem();
+            Itm_Parar = new ToolStripMenuItem();
+            Itm_Fechar = new ToolStripMenuItem();
+            contextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // timer1
@@ -55,10 +61,10 @@
             button1.FlatAppearance.BorderColor = Color.SteelBlue;
             button1.FlatStyle = FlatStyle.Flat;
             button1.ForeColor = Color.SteelBlue;
-            button1.Location = new Point(126, 73);
+            button1.Location = new Point(126, 99);
             button1.Name = "button1";
             button1.Size = new Size(85, 34);
-            button1.TabIndex = 0;
+            button1.TabIndex = 4;
             button1.Text = "Iniciar";
             button1.UseVisualStyleBackColor = false;
             button1.Click += BtnIniciar_Click;
@@ -70,10 +76,10 @@
             button2.FlatAppearance.BorderColor = Color.SteelBlue;
             button2.FlatStyle = FlatStyle.Flat;
             button2.ForeColor = Color.SteelBlue;
-            button2.Location = new Point(217, 73);
+            button2.Location = new Point(217, 99);
             button2.Name = "button2";
             button2.Size = new Size(85, 34);
-            button2.TabIndex = 0;
+            button2.TabIndex = 5;
             button2.Text = "Parar";
             button2.UseVisualStyleBackColor = false;
             button2.Click += BtnParar_Click;
@@ -82,7 +88,7 @@
             // 
             label2.Font = new Font("Segoe UI", 9F);
             label2.ForeColor = Color.SteelBlue;
-            label2.Location = new Point(6, 128);
+            label2.Location = new Point(6, 142);
             label2.Name = "label2";
             label2.Size = new Size(88, 20);
             label2.TabIndex = 2;
@@ -91,7 +97,8 @@
             // TxtIntervaloTempo
             // 
             TxtIntervaloTempo.BackColor = Color.LightGray;
-            TxtIntervaloTempo.Location = new Point(6, 84);
+            TxtIntervaloTempo.ForeColor = Color.SteelBlue;
+            TxtIntervaloTempo.Location = new Point(6, 110);
             TxtIntervaloTempo.Name = "TxtIntervaloTempo";
             TxtIntervaloTempo.Size = new Size(88, 23);
             TxtIntervaloTempo.TabIndex = 3;
@@ -101,7 +108,7 @@
             // 
             label3.AutoSize = true;
             label3.ForeColor = Color.SteelBlue;
-            label3.Location = new Point(6, 58);
+            label3.Location = new Point(6, 84);
             label3.Name = "label3";
             label3.Size = new Size(88, 15);
             label3.TabIndex = 2;
@@ -109,6 +116,7 @@
             // 
             // notifyIcon1
             // 
+            notifyIcon1.ContextMenuStrip = contextMenuStrip1;
             notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
             notifyIcon1.Text = "Ativa Janela";
             notifyIcon1.Visible = true;
@@ -118,7 +126,7 @@
             // 
             LblIntervaloDecorrido.Font = new Font("Segoe UI", 9F);
             LblIntervaloDecorrido.ForeColor = Color.SteelBlue;
-            LblIntervaloDecorrido.Location = new Point(245, 125);
+            LblIntervaloDecorrido.Location = new Point(245, 142);
             LblIntervaloDecorrido.Name = "LblIntervaloDecorrido";
             LblIntervaloDecorrido.Size = new Size(57, 20);
             LblIntervaloDecorrido.TabIndex = 2;
@@ -128,7 +136,7 @@
             // 
             LblUltimaTecla.Font = new Font("Segoe UI", 9F);
             LblUltimaTecla.ForeColor = Color.SteelBlue;
-            LblUltimaTecla.Location = new Point(100, 128);
+            LblUltimaTecla.Location = new Point(100, 142);
             LblUltimaTecla.Name = "LblUltimaTecla";
             LblUltimaTecla.Size = new Size(85, 20);
             LblUltimaTecla.TabIndex = 2;
@@ -149,24 +157,62 @@
             CboProgramasAtivos.Location = new Point(6, 27);
             CboProgramasAtivos.Name = "CboProgramasAtivos";
             CboProgramasAtivos.Size = new Size(218, 23);
-            CboProgramasAtivos.TabIndex = 4;
+            CboProgramasAtivos.TabIndex = 0;
             // 
             // BtnAtualizarProgramasAtivos
             // 
             BtnAtualizarProgramasAtivos.Location = new Point(230, 27);
             BtnAtualizarProgramasAtivos.Name = "BtnAtualizarProgramasAtivos";
             BtnAtualizarProgramasAtivos.Size = new Size(72, 23);
-            BtnAtualizarProgramasAtivos.TabIndex = 5;
+            BtnAtualizarProgramasAtivos.TabIndex = 1;
             BtnAtualizarProgramasAtivos.Text = "Atualizar";
             BtnAtualizarProgramasAtivos.UseVisualStyleBackColor = true;
             BtnAtualizarProgramasAtivos.Click += BtnAtualizarProgramasAtivos_Click;
+            // 
+            // ChkRastrearMovimentoMouse
+            // 
+            ChkRastrearMovimentoMouse.AutoSize = true;
+            ChkRastrearMovimentoMouse.Location = new Point(6, 56);
+            ChkRastrearMovimentoMouse.Name = "ChkRastrearMovimentoMouse";
+            ChkRastrearMovimentoMouse.Size = new Size(189, 19);
+            ChkRastrearMovimentoMouse.TabIndex = 2;
+            ChkRastrearMovimentoMouse.Text = "Rastrear movimento do mouse";
+            ChkRastrearMovimentoMouse.UseVisualStyleBackColor = true;
+            // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { Itm_Iniciar, Itm_Parar, Itm_Fechar });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(110, 70);
+            // 
+            // Itm_Iniciar
+            // 
+            Itm_Iniciar.Name = "Itm_Iniciar";
+            Itm_Iniciar.Size = new Size(109, 22);
+            Itm_Iniciar.Text = "Iniciar";
+            Itm_Iniciar.Click += Itm_Iniciar_Click;
+            // 
+            // Itm_Parar
+            // 
+            Itm_Parar.Name = "Itm_Parar";
+            Itm_Parar.Size = new Size(109, 22);
+            Itm_Parar.Text = "Parar";
+            Itm_Parar.Click += Itm_Parar_Click;
+            // 
+            // Itm_Fechar
+            // 
+            Itm_Fechar.Name = "Itm_Fechar";
+            Itm_Fechar.Size = new Size(109, 22);
+            Itm_Fechar.Text = "Fechar";
+            Itm_Fechar.Click += Itm_Fechar_Click;
             // 
             // FrmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LightSteelBlue;
-            ClientSize = new Size(314, 155);
+            ClientSize = new Size(314, 176);
+            Controls.Add(ChkRastrearMovimentoMouse);
             Controls.Add(BtnAtualizarProgramasAtivos);
             Controls.Add(CboProgramasAtivos);
             Controls.Add(TxtIntervaloTempo);
@@ -177,6 +223,7 @@
             Controls.Add(label3);
             Controls.Add(button2);
             Controls.Add(button1);
+            ForeColor = Color.SteelBlue;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FrmPrincipal";
@@ -184,6 +231,7 @@
             FormClosing += Form1_FormClosing;
             Load += Form1_Load;
             Shown += FrmPrincipal_Shown;
+            contextMenuStrip1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -202,5 +250,10 @@
         private Label label1;
         private ComboBox CboProgramasAtivos;
         private Button BtnAtualizarProgramasAtivos;
+        private CheckBox ChkRastrearMovimentoMouse;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem Itm_Iniciar;
+        private ToolStripMenuItem Itm_Parar;
+        private ToolStripMenuItem Itm_Fechar;
     }
 }
